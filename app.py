@@ -2,7 +2,7 @@ import json,os,csv
 from datetime import datetime
 from urllib.parse import quote
 import streamlit as st
-from styles import apply_styles,show_brand
+from styles import apply_styles,show_brand,show_sidebar_brand
 from translations import TEXT
 from engine import BUDGETS,LAND_EN,LAND_HI,score_project
 
@@ -17,7 +17,7 @@ if 'lang' not in st.session_state: st.session_state.lang=None
 if 'show_results' not in st.session_state: st.session_state.show_results=False
 
 if not st.session_state.lang:
-    show_brand('AB ENGITECH Business Opportunity Finder','Choose your preferred language / अपनी भाषा चुनें')
+    show_brand('AB ENGITECH Business Opportunity Finder','Choose your preferred language / अपनी भाषा चुनें','en')
     c1,c2=st.columns(2)
     if c1.button('English',type='primary',use_container_width=True): st.session_state.lang='en'; st.rerun()
     if c2.button('हिंदी',use_container_width=True): st.session_state.lang='hi'; st.rerun()
@@ -26,20 +26,24 @@ if not st.session_state.lang:
 lang=st.session_state.lang
 t=TEXT[lang]
 with st.sidebar:
-    st.image('assets/logo.svg',use_container_width=True)
-    st.caption('AB ENGITECH • Jodhpur')
+    show_sidebar_brand()
     st.markdown('### Language / भाषा')
     if st.button('हिंदी' if lang=='en' else 'English',use_container_width=True):
         st.session_state.lang='hi' if lang=='en' else 'en'; st.session_state.show_results=False; st.rerun()
 
-show_brand(t['title'],t['tag'])
+show_brand(t['title'],t['tag'],lang)
 st.markdown(f'<div class="panel"><h3>{t["filters"]}</h3><p>{t["intro"]}</p>',unsafe_allow_html=True)
 
 c1,c2,c3=st.columns(3)
 display_districts=[d['name'] if lang=='en' else d['hi'] for d in DISTRICTS]
 selected_district=c1.selectbox(t['district'],display_districts)
 area=c2.selectbox(t['area'],[t['rural'],t['urban'],t['undecided']])
-budget_label=c3.selectbox(t['budget'],list(BUDGETS.keys()))
+
+budget_en=list(BUDGETS.keys())
+budget_hi=['₹10–20 लाख','₹20–35 लाख','₹35–50 लाख','₹50 लाख–₹1 करोड़','₹1–2 करोड़','₹2–5 करोड़','₹5 करोड़ से अधिक']
+budget_display=c3.selectbox(t['budget'],budget_en if lang=='en' else budget_hi)
+budget_label=budget_display if lang=='en' else budget_en[budget_hi.index(budget_display)]
+
 capital_options=['Below ₹5 lakh','₹5–10 lakh','₹10–25 lakh','₹25–50 lakh','₹50 lakh–₹1 crore','Above ₹1 crore'] if lang=='en' else ['₹5 लाख से कम','₹5–10 लाख','₹10–25 लाख','₹25–50 लाख','₹50 लाख–₹1 करोड़','₹1 करोड़ से अधिक']
 capital=st.selectbox(t['capital'],capital_options)
 land_status=st.selectbox(t['land'],[t['available'],t['arrange'],t['rent'],t['not_sure']])
@@ -68,13 +72,16 @@ if st.session_state.show_results:
             a.write(desc)
             b.markdown(f'<div class="score">{t["score"]}<br><b>{score}/100</b></div>',unsafe_allow_html=True)
             m1,m2,m3,m4=st.columns(4)
-            m1.metric(t['investment'],f'₹{p["min_budget"]}–{p["max_budget"]} L')
-            m2.metric(t['space'],f'{p["land_min"]:,}–{p["land_max"]:,} sq ft')
+            invest_text=f'₹{p["min_budget"]}–{p["max_budget"]} L' if lang=='en' else f'₹{p["min_budget"]}–{p["max_budget"]} लाख'
+            space_text=f'{p["land_min"]:,}–{p["land_max"]:,} sq ft' if lang=='en' else f'{p["land_min"]:,}–{p["land_max"]:,} वर्गफुट'
+            m1.metric(t['investment'],invest_text)
+            m2.metric(t['space'],space_text)
             m3.metric(t['power'],f'{p["power_min"]}–{p["power_max"]} kW')
             m4.metric(t['manpower'],f'{p["manpower_min"]}–{p["manpower_max"]}')
             with st.expander(t['details']):
                 st.write(f'**{t["capacity"]}:** {p["capacity_en"] if lang=="en" else p["capacity_hi"]}')
-                st.write(f'**{t["complexity"]}:** {p["regulatory"]}')
+                complexity=p['regulatory'] if lang=='en' else {'Low':'कम','Medium':'मध्यम','High':'उच्च'}.get(p['regulatory'],p['regulatory'])
+                st.write(f'**{t["complexity"]}:** {complexity}')
                 st.write(f'**{t["support"]}:**')
                 st.info(t['pmegp_ok'] if p['pmegp'] and p['min_budget']<=50 else t['pmegp_high'])
                 if p['rips']: st.info(t['rips'])
