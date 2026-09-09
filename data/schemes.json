@@ -1,0 +1,16 @@
+{
+  "pmegp": {
+    "name":"PMEGP",
+    "manufacturing_project_ceiling_lakh":50,
+    "general":{"urban":15,"rural":25,"contribution":10},
+    "special":{"urban":25,"rural":35,"contribution":5},
+    "notes_en":"For new eligible micro-enterprises. Manufacturing projects above ₹10 lakh require at least VIII-standard education. Final sanction depends on scheme rules, bank appraisal and applicant eligibility.",
+    "notes_hi":"नई पात्र सूक्ष्म इकाइयों के लिए। ₹10 लाख से अधिक विनिर्माण परियोजना के लिए कम से कम 8वीं पास योग्यता आवश्यक है। अंतिम स्वीकृति योजना नियम, बैंक मूल्यांकन और आवेदक की पात्रता पर निर्भर है।"
+  },
+  "rips": {
+    "name":"RIPS 2024",
+    "valid_till":"2029-03-31",
+    "notes_en":"Rajasthan Investment Promotion Scheme 2024 offers standard and add-on incentives to eligible investments. Exact benefit must be calculated from the enterprise/investment profile and official LaabhCalc/policy.",
+    "notes_hi":"राजस्थान निवेश प्रोत्साहन योजना 2024 पात्र निवेशों को मानक और अतिरिक्त प्रोत्साहन देती है। वास्तविक लाभ उद्यम/निवेश प्रोफाइल तथा आधिकारिक LaabhCalc/नीति से तय होगा।"
+  }
+}
